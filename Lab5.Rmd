@@ -90,7 +90,32 @@ I used the quantile classification that uses 5 classes. It is a simple way to co
 
 ## Task 2
 ### 2.1
+```{r}
+
+sa <- oh_counties %>%
+  filter(NAME %in% c("Portage", "Summit"))
+
+oh_region <- sa %>%
+  st_bbox() %>%
+  st_as_sfc()
+
+sa
+oh_region
+
+```
+
 ### 2.2
+```{r}
+
+oh_places <- st_read("data/static_mapping/oh_places.gpkg")
+
+
+
+```
+
+
+
+
 ### 2.3
 ### 2.4
 ### 2.5
