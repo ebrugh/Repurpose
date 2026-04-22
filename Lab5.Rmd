@@ -122,18 +122,20 @@ places_sa <- st_collection_extract(places_sa, "POLYGON")
 places_labels <- st_point_on_surface(places_sa)
 
 map_places <- tm_shape(places_sa) +
-  tm_borders(col = "black", lwd = 1) +
+  tm_borders(col = "darkgrey", lwd = 1) +
   tm_shape(places_labels) +
-  tm_text(text = "NAME", size = 0.4)
+  tm_text(text = "NAME", size = 0.3)
 
 map_places
 
 ```
 
 
-
-
 ### 2.3
+
+
+
+
 ### 2.4
 ### 2.5
 
