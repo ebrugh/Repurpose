@@ -109,7 +109,24 @@ oh_region
 
 oh_places <- st_read("data/static_mapping/oh_places.gpkg")
 
+st_crs(oh_places)
+st_crs(sa)
+#NAD83
 
+oh_places <- st_make_valid(oh_places)
+sa <- st_make_valid(sa)
+
+places_sa <- st_intersection(oh_places, sa)
+places_sa <- st_collection_extract(places_sa, "POLYGON")
+
+places_labels <- st_point_on_surface(places_sa)
+
+map_places <- tm_shape(places_sa) +
+  tm_borders(col = "black", lwd = 1) +
+  tm_shape(places_labels) +
+  tm_text(text = "NAME", size = 0.4)
+
+map_places
 
 ```
 
