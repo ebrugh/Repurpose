@@ -132,6 +132,28 @@ map_places
 
 
 ### 2.3
+```{r}
+
+oh_parks <- st_read("data/static_mapping/oh_parks.gpkg")
+#WGS84
+#reproject
+
+if (st_crs(oh_parks) != st_crs(sa)) {
+  oh_parks <- st_transform(oh_parks, st_crs(sa))
+}
+
+parks_sa <- st_intersection(oh_parks, sa)
+
+map_parks <- tm_shape(parks_sa) +
+  tm_polygons(
+    col = "FEATTYPE",
+    palette = "brewer.greens",
+    border.col = "darkgreen",
+    lwd = 0.5
+  )
+
+map_parks
+```
 
 
 
