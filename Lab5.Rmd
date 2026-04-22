@@ -155,15 +155,70 @@ map_parks <- tm_shape(parks_sa) +
 map_parks
 ```
 
-
-
-
 ### 2.4
+```{r}
+
+portage_water <- st_read("data/static_mapping/tl_2022_39133_linearwater/tl_2022_39133_linearwater.shp")
+summit_water <- st_read("data/static_mapping/tl_2023_39153_linearwater/tl_2023_39153_linearwater.shp")
+
+#NAD83
+
+water_sa <- bind_rows(portage_water, summit_water)
+
+water_sa$intersects_park <- lengths(st_intersects(water_sa, parks_sa)) > 0
+
+map_water <- tm_shape(water_sa) +
+  tm_lines(
+    col = "intersects_park",
+    palette = c("grey", "lightblue"),
+    lwd = 1,
+  )
+
+map_water
+```
+
 ### 2.5
+```{r}
+
+map_local <- tm_shape(parks_sa) +
+  tm_polygons(
+    col = "FEATTYPE",
+    palette = "brewer.greens",
+    border.col = "darkgreen",
+    lwd = 0.5
+  ) +
+  tm_shape(water_sa) +
+  tm_lines(
+    col = "intersects_park",
+    palette = c("grey", "lightblue"),
+    lwd = 1
+  ) +
+  tm_shape(places_sa) +
+  tm_borders(col = "black", lwd = 1) +
+  tm_shape(places_labels) +
+  tm_text(text = "NAME", size = 0.3) 
+
+
+```
 
 
 ## Task 3
 ### 3.1
+```{r}
+
+dem <- rast("data/static_mapping/neoh_dem.tif")
+crs(dem) #NAD83
+
+dem_proj <- project(dem, st_crs(sa)$wkt) #project to same CRS
+
+dem_crop <- crop(dem_proj, vect(sa)) #trims the raster to the study area
+
+dem_crop
+
+```
+
+
+
 ### 3.2
 
 
