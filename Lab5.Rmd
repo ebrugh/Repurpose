@@ -177,6 +177,7 @@ map_water <- tm_shape(water_sa) +
 map_water
 ```
 
+
 ### 2.5
 ```{r}
 
@@ -198,7 +199,7 @@ map_local <- tm_shape(parks_sa) +
   tm_shape(places_labels) +
   tm_text(text = "NAME", size = 0.3) 
 
-
+map_local
 ```
 
 
@@ -218,8 +219,38 @@ dem_crop
 ```
 
 
-
 ### 3.2
+```{r}
+map_local_elev <- tm_shape(dem_crop) +
+  tm_raster(
+    palette("brewer.y1Gn"),
+    title = "Elevation"
+  ) +
+  tm_shape(sa) +
+  tm_polygons(
+    col = "white",
+    fill_alpha = 0.3,
+    border.col = "black",
+    lwd = 1
+  ) +
+  tm_shape(parks_sa) +
+  tm_polygons(
+    col = "FEATTYPE",
+    palette = "brewer.greens",
+    border.col = "darkgreen",
+    lwd = 0.5
+  ) +
+  tm_shape(water_sa) +
+  tm_lines(
+    col = "intersects_park",
+    palette = c("grey", "lightblue"),
+    lwd = 1
+  ) +
+  tm_compass() +
+  tm_scalebar()
+
+map_local_elev
+```
 
 
 ## Task 4
