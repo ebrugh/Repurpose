@@ -36,6 +36,8 @@ library(terra)
 library(tmap)
 library(tidyverse)
 library(grid) 
+
+setwd
 ```
 ## Task 1 - Ohio Map
 ### 1.1 
@@ -223,7 +225,7 @@ dem_crop
 ```{r}
 map_local_elev <- tm_shape(dem_crop) +
   tm_raster(
-    palette = colorRampPalette(c("yellow", "lightgreen", "darkgreen"))(10),
+    palette = colorRampPalette(c("lightyellow", "lightgreen", "darkgreen"))(15),
     title = "Elevation"
   ) +
   tm_shape(sa) +
@@ -254,18 +256,101 @@ map_local_elev
 
 ## Task 4
 ### 4.1
-### 4.2
+```{r}
 
+tmap_arrange(
+  map_ohio,
+  map_local_elev,
+  ncol = 2,
+  asp = 1
+)
+
+```
+#Reflection
+It puts them side by side but it does not show context. The spatial relationship between them is not clear and the maps use different scales so comparing them is not as accurate. 
+
+### 4.2
+```{r}
+
+map_inset <- tm_shape(oh_counties) + 
+  tm_polygons() +         
+  tm_shape(oh_region) + 
+  tm_borders(lwd = 2, col = "red") +  
+  tm_layout(bg.color = "lightblue") +
+  tm_scalebar(position = c("left", "bottom"))
+
+map_inset
+
+
+norm_dim <- function(obj) {
+  bbox <- st_bbox(obj)
+  width  <- bbox[["xmax"]] - bbox[["xmin"]]
+  height <- bbox[["ymax"]] - bbox[["ymin"]]
+  w <- width  / max(width, height)
+  h <- height / max(width, height)
+  return(unit(c(w, h), "snpc"))
+}
+
+main_dim <- norm_dim(oh_region)  
+ins_dim  <- norm_dim(oh_counties)
+
+main_vp <- viewport(width = main_dim[1], height = main_dim[2])
+
+ins_vp <- viewport(
+  width  = ins_dim[1] * 0.4,              
+  height = ins_dim[2] * 0.4,              
+  x      = unit(1, "npc") - unit(0.5, "cm"),  
+  y      = unit(0.01, "npc"),             
+  just   = c("right", "bottom")           
+)
+
+grid.newpage()
+print(map_local_elev, vp = main_vp)
+pushViewport(main_vp)
+print(map_inset, vp = ins_vp)
+```
+#Reflection
+noem_dim converts the cooridnate points into normalized proportions. Viewport can then calculate the width and height of the maps bounding box and scale them to keep the maps shape. Viewport doesnt use long/lat so it's necessary to change coordinate dimensions. 
 
 ## Task 5
+```{r}
+
+oh_dem <- rast("data/static_mapping/neoh_dem.tif")
+oh_dem_proj <- project(oh_dem, st_crs(oh_joined)$wkt)
+oh_dem_oh <- crop(oh_dem_proj, vect(oh_counties))
+
+tmap_mode("plot")
+
+my_map <- tm_shape(oh_dem_oh) +
+  tm_raster(
+    palette = colorRampPalette(c("lightyellow", "tan", "brown"))(10) 
+  ) +
+  tm_shape(oh_joined) +
+  tm_polygons(
+    col = "pct_f20to24", #women ages 20-24
+    style = "quantile",
+    n = 5,
+    alpha = 0.2, #county transparency
+    border.col = "black",
+    lwd = 0.4,
+    title = "Women ages 20-24"
+  ) +
+  tm_compass() +
+  tm_scalebar() +
+  tm_layout(
+    title = "Women Ages 20-24 and the Elevation in NE Ohio"
+  )
+
+my_map
+```
 
 
 #Questions
-1
-2
-3
-4
-5
+1. The quantile classification was chosen for a more even distribution and no clustering of counties. The color palette for task 1 was the default, but I think the blues do a good job of representing the variation in population. Equal intervals could compress the counties into fewer classes.
+2. The stream data was loaded into 1 dataset using bind_rows. The coordinate system was matched. To check the overlap of streams with parks I used st_intersects. the lengths() > 0 converted the results to where TRUE means that the stream intersects a park.
+3. tmap_arrange only arranges the maps side by side, but it quick. It's also less informative because the maps can be of different scale. The grid viewport is the true inset map that will show up on the map instead of beside it. 
+4. I made different color decisions. Specifically with the color ramp I used because I couldn't get my other options to work. The group used defaults and quick thinking choices. 
+5. The map I made shows the elevation and the population of women ages 20-24 in NE Ohio. The elevation is in the background with the counties on top. I don't think it's a good map though. I think that elevation and population could have been portrayed in a different way (maybe with different colors) that would have looked better and easier to follow. However you can still see a comparison.
 
 
 
