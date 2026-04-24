@@ -223,7 +223,7 @@ dem_crop
 ```{r}
 map_local_elev <- tm_shape(dem_crop) +
   tm_raster(
-    palette("brewer.y1Gn"),
+    palette = colorRampPalette(c("yellow", "lightgreen", "darkgreen"))(10),
     title = "Elevation"
   ) +
   tm_shape(sa) +
@@ -251,7 +251,6 @@ map_local_elev <- tm_shape(dem_crop) +
 
 map_local_elev
 ```
-
 
 ## Task 4
 ### 4.1
